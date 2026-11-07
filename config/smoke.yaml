@@ -1,0 +1,39 @@
+run_id: smoke
+data_path: data/btf_cached_scores/          # Stage A cache (per-scan scores and maps)
+mvtec_root: data/mvtec_3d_ad/
+metrics_path: experiments/metrics.json
+compute_path: experiments/compute.json
+receipt_path: experiments/receipt.json
+eval_split: test
+cpu_threads: 4
+seed: 42
+
+# data
+categories: [cookie]                        # TODO: pick the smallest after the BTF spike
+train_limit: 32                             # normal training scans
+eval_limit: 40                              # test scans
+
+# detector (BTF-style)
+variants: [rgb, fpfh, fused]
+coreset_fraction: 0.1
+
+# calibration
+bank_fraction: 0.8
+alpha: 0.05
+alpha_sensitivity: 0.10
+disagreement_quantile: 0.95                 # delta, leave-one-out on calibration normals
+
+# signals and gate
+n_bank_rebuilds: 2                          # dispersion baseline (5 in cpu.yaml)
+review_budgets: [0.10, 0.20]
+
+# failure injection (one condition for smoke)
+injection:
+  modalities: [rgb]
+  types: [noise]
+  levels: [medium]
+  rgb_noise_sigma: {medium: 0.05}
+  seed: 42
+
+# evaluation
+bootstrap_samples: 50

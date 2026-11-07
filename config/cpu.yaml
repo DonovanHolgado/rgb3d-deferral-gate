@@ -1,0 +1,45 @@
+run_id: reference
+data_path: data/btf_cached_scores/
+mvtec_root: data/mvtec_3d_ad/
+metrics_path: experiments/metrics.json
+compute_path: experiments/compute.json
+receipt_path: experiments/receipt.json
+eval_split: test
+cpu_threads: 4
+seed: 42
+
+# data
+categories: [potato, cookie, cable_gland, foam]   # candidates; finalize after the spike
+train_limit: null                           # use all normal training scans
+eval_limit: null                            # use the full test split
+
+# detector (BTF-style)
+variants: [rgb, fpfh, fused]
+coreset_fraction: 0.1
+
+# calibration
+bank_fraction: 0.8
+alpha: 0.05
+alpha_sensitivity: 0.10
+disagreement_quantile: 0.95
+
+# signals and gate
+n_bank_rebuilds: 5
+review_budgets: [0.10, 0.20]
+threshold_methods: [conformal, percentile, kde_975, gev]   # secondary sensitivity check
+
+# failure injection: 2 modalities x 2 types x 3 levels = 12 conditions
+injection:
+  modalities: [rgb, xyz]
+  types: [noise, dropout]
+  levels: [low, medium, high]
+  rgb_noise_sigma: {low: 0.02, medium: 0.05, high: 0.10}    # medium from the 2D study; low/high are my placeholders
+  xyz_jitter_std: {low: TODO, medium: TODO, high: TODO}      # define 3D analogs
+  point_dropout_frac: {low: TODO, medium: TODO, high: TODO}
+  misregistration: {shift_mm: TODO, rot_deg: TODO}           # held-out type
+  missing_modality_rates: [0.3, 0.5, 0.7]
+  missing_fill: all_ones
+  seed: 42
+
+# evaluation
+bootstrap_samples: 1000
